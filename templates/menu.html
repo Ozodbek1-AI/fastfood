@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .user-badge {
+            padding: 8px 16px;
+            background: #dbeafe;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #1e40af;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .menu-item-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+        }
+
+        .menu-item-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .menu-item-price {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .menu-item-body {
+            padding: 20px;
+        }
+
+        .menu-item-description {
+            color: #6b7280;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .menu-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-gram {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-ml {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-piece {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .menu-item-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .close-btn:hover {
+            color: #374151;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .search-filter {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-filter input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🍕 Menu Management</h1>
+            <div class="header-actions">
+                <span id="userBadge" class="user-badge">👤 User</span>
+                <button id="logoutBtn" class="btn btn-danger">🚪 Chiqish</button>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div id="alertBox"></div>
+
+        <!-- Search -->
+        <div class="search-filter">
+            <input type="text" id="searchInput" placeholder="🔍 Menyu qidirish..." onkeyup="searchMenu()">
+        </div>
+
+        <!-- Menu Grid -->
+        <div id="menuGrid" class="menu-grid"></div>
+
+        <!-- Add/Edit Modal -->
+        <div id="menuModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Menyu qo'shish</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label>Nomi *</label>
+                    <input type="text" id="menuTitle" placeholder="Menyu nomi">
+                </div>
+                <div class="form-group">
+                    <label>Tavsif</label>
+                    <textarea id="menuDescription" placeholder="Menyu haqida ma'lumot"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Narxi *</label>
+                        <input type="number" id="menuPrice" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>O'lchov birligi *</label>
+                        <select id="menuMeasurement">
+                            <option value="GR">Gram</option>
+                            <option value="ML">Milliliter</option>
+                            <option value="PC">Piece</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-success" style="flex: 1;" onclick="saveMenu()">💾 Saqlash</button>
+                    <button class="btn btn-danger" onclick="closeModal()">❌ Bekor qilish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api/v1';
+        let token = localStorage.getItem('access_token');
+        let isAdmin = false;
+        let editingMenuId = null;
+        let allMenuItems = [];
+
+        // Initialize
+        window.onload = function() {
+            if (!token) {
+                window.location.href = 'users.html'; // Login sahifasiga qaytarish
+                return;
+            }
+            checkAdminStatus();
+            fetchMenuItems();
+        };
+
+        // Check if user is admin (FAQAT TEKSHIRISH UCHUN)
+        async function checkAdminStatus() {
+            try {
+                const userId = localStorage.getItem('user_id');
+                const response = await fetch(`${API_URL}/users/profile/${userId}/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                isAdmin = data.is_staff || false;
+
+                // Agar admin bo'lsa, admin.html ga yo'naltirish
+                if (isAdmin) {
+                    window.location.href = 'admin.html';
+                    return;
+                }
+
+                // Oddiy user - faqat menu ko'radi
+                document.getElementById('userBadge').innerHTML = '👤 User';
+            } catch (error) {
+                console.log('User status tekshirib bo\'lmadi');
+            }
+        }
+
+        // Show Alert
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertBox.innerHTML = '';
+            }, 5000);
+        }
+
+        // Fetch Menu Items
+        async function fetchMenuItems() {
+            try {
+                const response = await fetch(`${API_URL}/menu/menu/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                allMenuItems = data;
+                displayMenuItems(data);
+            } catch (error) {
+                showAlert('❌ Menyu yuklanmadi: ' + error.message, 'error');
+            }
+        }
+
+        // Display Menu Items
+        function displayMenuItems(items) {
+            const menuGrid = document.getElementById('menuGrid');
+
+            if (items.length === 0) {
+                menuGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🍽️</div>
+                        <h3>Menyu topilmadi</h3>
+                        <p>Hozircha menyu yo'q yoki qidiruv natijasi topilmadi</p>
+                    </div>
+                `;
+                return;
+            }
+
+            menuGrid.innerHTML = items.map(item => {
+                const measurementText = {
+                    'GR': '📏 Gram',
+                    'ML': '💧 Milliliter',
+                    'PC': '🔢 Piece'
+                };
+
+                const measurementClass = {
+                    'GR': 'badge-gram',
+                    'ML': 'badge-ml',
+                    'PC': 'badge-piece'
+                };
+
+                return `
+                    <div class="menu-item">
+                        <div class="menu-item-header">
+                            <div class="menu-item-title">${item.title}</div>
+                            <div class="menu-item-price">${parseFloat(item.price).toLocaleString()} so'm</div>
+                        </div>
+                        <div class="menu-item-body">
+                            <p class="menu-item-description">${item.description || 'Tavsif yo\'q'}</p>
+                            <div class="menu-item-meta">
+                                <span class="badge ${measurementClass[item.measurement_type]}">
+                                    ${measurementText[item.measurement_type]}
+                                </span>
+                            </div>
+                            ${isAdmin ? `
+                                <div class="menu-item-actions">
+                                    <button class="btn btn-warning btn-sm" onclick="editMenu(${item.id})">
+                                        ✏️ Tahrirlash
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteMenu(${item.id})">
+                                        🗑️ O'chirish
+                                    </button>
+                                </div>
+                            ` : '<!-- Oddiy user uchun tugmalar yo\'q -->'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Search Menu
+        function searchMenu() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allMenuItems.filter(item =>
+                item.title.toLowerCase().includes(searchTerm) ||
+                (item.description && item.description.toLowerCase().includes(searchTerm))
+            );
+            displayMenuItems(filtered);
+        }
+
+        // Open Add Modal
+        document.getElementById('addMenuBtn').addEventListener('click', function() {
+            editingMenuId = null;
+            document.getElementById('modalTitle').textContent = 'Menyu qo\'shish';
+            document.getElementById('menuTitle').value = '';
+            document.getElementById('menuDescription').value = '';
+            document.getElementById('menuPrice').value = '';
+            document.getElementById('menuMeasurement').value = 'GR';
+            document.getElementById('menuModal').classList.add('active');
+        });
+
+        // Edit Menu
+        async function editMenu(id) {
+            editingMenuId = id;
+            document.getElementById('modalTitle').textContent = 'Menyuni tahrirlash';
+
+            try {
+                const response = await fetch(`${API_URL}/menu/menu/${id}/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const item = await response.json();
+
+                document.getElementById('menuTitle').value = item.title;
+                document.getElementById('menuDescription').value = item.description || '';
+                document.getElementById('menuPrice').value = item.price;
+                document.getElementById('menuMeasurement').value = item.measurement_type;
+                document.getElementById('menuModal').classList.add('active');
+            } catch (error) {
+                showAlert('❌ Ma\'lumot yuklanmadi', 'error');
+            }
+        }
+
+        // Save Menu
+        async function saveMenu() {
+            const title = document.getElementById('menuTitle').value;
+            const description = document.getElementById('menuDescription').value;
+            const price = document.getElementById('menuPrice').value;
+            const measurement_type = document.getElementById('menuMeasurement').value;
+
+            if (!title || !price) {
+                showAlert('⚠️ Barcha majburiy maydonlarni to\'ldiring!', 'error');
+                return;
+            }
+
+            const data = {
+                title,
+                description,
+                price: parseFloat(price),
+                measurement_type
+            };
+
+            try {
+                let url, method;
+                if (editingMenuId) {
+                    url = `${API_URL}/menu/menu/${editingMenuId}/update/`;
+                    method = 'PATCH';
+                } else {
+                    url = `${API_URL}/menu/menu/create/`;
+                    method = 'POST';
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('✅ Muvaffaqiyatli saqlandi!', 'success');
+                    closeModal();
+                    fetchMenuItems();
+                } else {
+                    const error = await response.json();
+                    showAlert('❌ Xatolik: ' + JSON.stringify(error), 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Tarmoq xatosi: ' + error.message, 'error');
+            }
+        }
+
+        // Delete Menu
+        async function deleteMenu(id) {
+            if (!confirm('Rostdan ham o\'chirmoqchimisiz?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/menu/menu/${id}/delete/`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    showAlert('✅ Menyu o\'chirildi', 'success');
+                    fetchMenuItems();
+                } else {
+                    showAlert('❌ O\'chirib bo\'lmadi', 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Xatolik: ' + error.message, 'error');
+            }
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('menuModal').classList.remove('active');
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.clear();
+            window.location.href = 'users.html';
+        });
+
+        // Close modal on outside click
+        document.getElementById('menuModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
