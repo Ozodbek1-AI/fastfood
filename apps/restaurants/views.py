@@ -31,7 +31,8 @@ class RestaurantUpdateAPIView(UpdateAPIView):
     lookup_field = 'pk'
 
     def get_queryset(self):
-        # Faqat restaurant egasi update qila oladi
+        if getattr(self, 'swagger_fake_view', False) or self.request.user.is_anonymous:
+            return Restaurant.objects.none()
         return Restaurant.objects.filter(owner=self.request.user)
 
 
@@ -45,7 +46,6 @@ class RestaurantDeleteAPIView(DestroyAPIView):
     lookup_field = 'pk'
 
     def get_queryset(self):
-        # Faqat restaurant egasi o‘chira oladi
         return Restaurant.objects.filter(owner=self.request.user)
 
 
@@ -56,3 +56,11 @@ class RestaurantListAPIView(ListAPIView):
     serializer_class = RestaurantListSerializer
     permission_classes = [IsAuthenticated]
     queryset = Restaurant.objects.all()
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False) or self.request.user.is_anonymous:
+            return Restaurant.objects.none()
+        return Restaurant.objects.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

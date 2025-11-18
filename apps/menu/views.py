@@ -1,44 +1,63 @@
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import MenuItem
 from .serializers import (
     MenuItemCreateSerializer,
     MenuItemUpdateSerializer,
-    MenuItemReadSerializer
+    MenuItemListSerializer,
+    MenuItemDeleteSerializer
 )
-from .permissions import IsAdminOrReadOnly
 
-# List
-class MenuItemListAPIView(generics.ListAPIView):
-    queryset = MenuItem.objects.filter(is_active=True)
-    serializer_class = MenuItemReadSerializer
-    permission_classes = [IsAuthenticated]  # Hamma token bilan ko‘ra oladi
 
-# Retrieve
-class MenuItemDetailAPIView(generics.RetrieveAPIView):
-    queryset = MenuItem.objects.filter(is_active=True)
-    serializer_class = MenuItemReadSerializer
-    permission_classes = [IsAuthenticated]  # Hamma token bilan ko‘ra oladi
-
-# Create
-class MenuItemCreateAPIView(generics.CreateAPIView):
-    queryset = MenuItem.objects.all()
+# ======================
+# Create MenuItem
+# ======================
+class MenuItemCreateAPIView(CreateAPIView):
     serializer_class = MenuItemCreateSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
-# Update
-class MenuItemUpdateAPIView(generics.UpdateAPIView):
-    queryset = MenuItem.objects.all()
+
+    def perform_create(self, serializer):
+        restaurant = serializer.validated_data.get('restaurant')
+        user = self.request.user
+        if restaurant.owner != user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only add items to your own restaurant.")
+        serializer.save()
+
+
+# ======================
+# Update MenuItem (PATCH)
+# ======================
+class MenuItemUpdateAPIView(UpdateAPIView):
     serializer_class = MenuItemUpdateSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
-
-# Delete
-class MenuItemDeleteAPIView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = MenuItem.objects.all()
-    serializer_class = MenuItemReadSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
+    lookup_field = 'pk'
 
-    def perform_destroy(self, instance):
-        # Soft delete
-        instance.is_active = False
-        instance.save()
+    def get_queryset(self):
+        return MenuItem.objects.filter(restaurant__owner=self.request.user)
+
+
+# ======================
+# Delete MenuItem (DELETE)
+# ======================
+class MenuItemDeleteAPIView(DestroyAPIView):
+    serializer_class = MenuItemDeleteSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = MenuItem.objects.all()
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        return MenuItem.objects.filter(restaurant__owner=self.request.user)
+
+
+# ======================
+# List MenuItems (GET)
+# ======================
+class MenuItemListAPIView(ListAPIView):
+    serializer_class = MenuItemListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return MenuItem.objects.filter(restaurant__owner=self.request.user)

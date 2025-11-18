@@ -10,7 +10,6 @@ class RestaurantCreateSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'address', 'is_active']
 
     def validate_name(self, value):
-        # Create paytida nom unique bo'lishi kerak
         if Restaurant.objects.filter(name=value).exists():
             raise serializers.ValidationError("This restaurant name is already taken.")
         return value

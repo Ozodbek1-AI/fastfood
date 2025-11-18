@@ -1,40 +1,69 @@
 from rest_framework import serializers
 from .models import MenuItem
 
-# CREATE serializer
+# ======================
+# Create serializer
+# ======================
 class MenuItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
-        fields = ['title', 'description', 'price', 'measurement_type', 'is_active']
+        fields = ['id', 'restaurant', 'title', 'description', 'price', 'measurement_type', 'is_active']
 
-    def validate_price(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("Price 0 dan katta bo‘lishi kerak")
+    def validate_restaurant(self, value):
+        """
+        Faqat restoran egasi item qo‘shishi mumkin.
+        """
+        user = self.context['request'].user
+        if value.owner != user:
+            raise serializers.ValidationError("You can only add items to your own restaurant.")
         return value
 
-    def validate_measurement_type(self, value):
-        if value not in dict(MenuItem.MEASUREMENT_CHOICES):
-            raise serializers.ValidationError("Invalid measurement type")
-        return value
 
-# UPDATE serializer
+# ======================
+# Update serializer
+# ======================
 class MenuItemUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = ['title', 'description', 'price', 'measurement_type', 'is_active']
 
-    def validate_price(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("Price 0 dan katta bo‘lishi kerak")
-        return value
+    def validate(self, attrs):
+        """
+        Faqat restaurant egasi itemni update qilishi mumkin.
+        """
+        item = self.instance
+        user = self.context['request'].user
+        if item.restaurant.owner != user:
+            raise serializers.ValidationError("You can only update items of your own restaurant.")
+        return attrs
 
-    def validate_measurement_type(self, value):
-        if value not in dict(MenuItem.MEASUREMENT_CHOICES):
-            raise serializers.ValidationError("Invalid measurement type")
-        return value
 
-# GET / List serializer
-class MenuItemReadSerializer(serializers.ModelSerializer):
+# ======================
+# List serializer
+# ======================
+class MenuItemListSerializer(serializers.ModelSerializer):
+    restaurant = serializers.StringRelatedField(read_only=True)  # restaurant nomini ko‘rsatadi
+
     class Meta:
         model = MenuItem
-        fields = ['id', 'title', 'description', 'price', 'measurement_type', 'is_active', 'created_at', 'updated_at']
+        fields = [
+            'id',
+            'title',
+            'description',
+            'price',
+            'measurement_type',
+            'is_active',
+            'restaurant',
+            'created_at',
+            'updated_at',
+        ]
+
+
+# ======================
+# Delete serializer
+# ======================
+class MenuItemDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MenuItem
+        fields = ['id']
+        read_only_fields = ['id']  # delete uchun faqat id kerak, o‘zgartirish mumkin emas
