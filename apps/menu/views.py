@@ -1,5 +1,5 @@
 from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, AllowAny
 from .models import MenuItem
 from .serializers import (
     MenuItemCreateSerializer,
@@ -14,7 +14,7 @@ from .serializers import (
 # ======================
 class MenuItemCreateAPIView(CreateAPIView):
     serializer_class = MenuItemCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
     def perform_create(self, serializer):
@@ -31,7 +31,7 @@ class MenuItemCreateAPIView(CreateAPIView):
 # ======================
 class MenuItemUpdateAPIView(UpdateAPIView):
     serializer_class = MenuItemUpdateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     queryset = MenuItem.objects.all()
     lookup_field = 'pk'
 
@@ -44,7 +44,7 @@ class MenuItemUpdateAPIView(UpdateAPIView):
 # ======================
 class MenuItemDeleteAPIView(DestroyAPIView):
     serializer_class = MenuItemDeleteSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     queryset = MenuItem.objects.all()
     lookup_field = 'pk'
 
@@ -57,7 +57,7 @@ class MenuItemDeleteAPIView(DestroyAPIView):
 # ======================
 class MenuItemListAPIView(ListAPIView):
     serializer_class = MenuItemListSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         return MenuItem.objects.filter(restaurant__owner=self.request.user)

@@ -51,3 +51,8 @@ class OrderCancelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id']
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'

@@ -1,5 +1,5 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from .models import Order
 from .serializers import OrderCreateSerializer, OrderListSerializer, OrderCancelSerializer
 
@@ -9,7 +9,7 @@ from .serializers import OrderCreateSerializer, OrderListSerializer, OrderCancel
 # ======================
 class OrderCreateAPIView(CreateAPIView):
     serializer_class = OrderCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -20,7 +20,7 @@ class OrderCreateAPIView(CreateAPIView):
 # ======================
 class OrderListAPIView(ListAPIView):
     serializer_class = OrderListSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
@@ -31,7 +31,7 @@ class OrderListAPIView(ListAPIView):
 # ======================
 class OrderCancelAPIView(DestroyAPIView):
     serializer_class = OrderCancelSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     lookup_field = 'pk'
 
     def get_queryset(self):
